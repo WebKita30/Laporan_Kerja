@@ -2,7 +2,7 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <title>Dashboard Borongan kerja - Privat</title>
+    <title>Dashboard Kerja Borongan Kerjas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -13,13 +13,13 @@
         box-sizing: border-box;
       }
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: #f0f2f5;
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f6f8;
+        padding: 12px;
         margin: 0;
-        padding: 0;
       }
 
-      /* Tampilan Layar Login & Blokir */
+      /* Area Login */
       #auth-screen {
         display: flex;
         align-items: center;
@@ -27,174 +27,213 @@
         height: 100vh;
         background: #1e3c72;
         color: white;
-        padding: 20px;
+        text-align: center;
       }
       .auth-box {
         background: white;
         color: #333;
         padding: 30px;
         border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         width: 100%;
-        max-width: 400px;
-        text-align: center;
+        max-width: 380px;
       }
 
-      /* Dashboard Area */
+      /* Dashboard Area (Disembunyikan jika belum login) */
       #main-content {
-        display: none; /* Sembunyi sebelum login */
-        padding: 15px;
+        display: none;
       }
+
       .container {
-        max-width: 1000px;
+        max-width: 1100px;
         margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        padding: 16px;
+        border-radius: 14px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
 
       .header-flex {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #eee;
+        margin-bottom: 15px;
       }
 
       h1 {
         color: #1e3c72;
         margin: 0;
-        font-size: 22px;
+        font-size: 24px;
       }
 
-      /* Form Input */
-      .form-grid {
+      .form {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 12px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
       }
-      input,
-      select,
-      .btn-main {
+      .form input,
+      .form select,
+      .form button {
         padding: 12px;
-        border: 1px solid #ddd;
         border-radius: 10px;
-        font-size: 14px;
+        border: 1px solid #ccc;
       }
-      .btn-main {
+      .form button {
         background: #1e3c72;
-        color: white;
-        border: none;
+        color: #fff;
         font-weight: bold;
         cursor: pointer;
       }
 
-      /* Tabel */
       .table-wrapper {
-        overflow-x: auto;
-        border: 1px solid #eee;
+        max-height: 400px;
+        overflow: auto;
+        margin-top: 15px;
+        border: 1px solid #ccc;
         border-radius: 10px;
       }
       table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 520px;
       }
-      th {
+      thead th {
+        position: sticky;
+        top: 0;
         background: #1e3c72;
-        color: white;
-        padding: 12px;
+        color: #fff;
+        padding: 8px;
         font-size: 13px;
       }
       td {
-        padding: 10px;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 6px;
+        font-size: 12px;
         text-align: center;
-        font-size: 13px;
+        border-bottom: 1px solid #eee;
       }
       .tanggal-row {
         background: #eef3ff;
         font-weight: bold;
         text-align: left;
-        padding-left: 10px;
       }
       .total-harian {
         background: #fafafa;
         font-weight: bold;
-        color: #28a745;
       }
-
-      /* Tombol-Tombol */
-      .btn-action {
-        width: 100%;
-        padding: 15px;
-        margin-top: 10px;
+      tfoot {
+        display: none;
+        background: #e9f7ef;
+        font-weight: bold;
+      }
+      .btn-del {
+        background: #e74c3c;
+        color: #fff;
         border: none;
-        border-radius: 10px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .btn {
+        width: 100%;
+        padding: 14px;
+        margin-top: 12px;
+        border: none;
+        border-radius: 12px;
         font-weight: bold;
         cursor: pointer;
       }
+      .btn-total {
+        background: #0c7c59;
+        color: #fff;
+      }
       .btn-pdf {
         background: #34495e;
-        color: white;
+        color: #fff;
       }
-      .btn-total {
-        background: #28a745;
-        color: white;
+      .btn-hapus {
+        background: #c0392b;
+        color: #fff;
       }
       .btn-logout {
         background: #ff4757;
         color: white;
+        border: none;
         padding: 8px 15px;
         border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
         font-size: 12px;
-        border: none;
-        cursor: pointer;
-      }
-      .btn-del {
-        background: #ff4757;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
       }
 
-      /* Footer & History */
-      .footer-info {
-        margin-top: 30px;
+      .history-card {
+        margin-top: 20px;
         padding: 15px;
         background: #f8f9fa;
         border-radius: 10px;
         font-size: 11px;
+        color: #666;
         border: 1px dashed #ccc;
       }
 
-      /* Hidden area untuk PDF */
+      @media (max-width: 900px) {
+        .form {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 600px) {
+        .form {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* PDF AREA */
       #pdfArea {
         position: absolute;
         left: -9999px;
         width: 800px;
-        background: white;
-        padding: 30px;
+        background: #fff;
+        padding: 20px;
+      }
+      #pdfArea th,
+      #pdfArea td {
+        border: 1px solid #000;
+        padding: 6px;
+        font-size: 12px;
       }
     </style>
   </head>
+
   <body>
     <div id="auth-screen">
       <div class="auth-box" id="authBox">
-        <h2>🔐 Keamanan Sistem</h2>
-        <p>Silakan daftar/masuk untuk mengakses dashboard.</p>
+        <h2>🔐 Kunci Perangkat</h2>
+        <p>Masukkan Password untuk mengakses dashboard.</p>
         <input
           type="password"
           id="passInput"
-          placeholder="Masukkan Password"
-          style="width: 100%; margin-bottom: 15px"
+          placeholder="Password Akses"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+          "
         />
-        <button onclick="prosesLogin()" class="btn-main" style="width: 100%">
-          MASUK KE SISTEM
+        <button
+          onclick="cekLogin()"
+          style="
+            width: 100%;
+            padding: 12px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+          "
+        >
+          MASUK SISTEM
         </button>
       </div>
     </div>
@@ -202,22 +241,22 @@
     <div id="main-content">
       <div class="container">
         <div class="header-flex">
-          <h1>📊 Borongan kerja</h1>
-          <button class="btn-logout" onclick="keluarSistem()">🚪 Keluar</button>
+          <h1>📊 Dashboard Borongan</h1>
+          <button class="btn-logout" onclick="logout()">🚪 KELUAR</button>
         </div>
 
-        <div class="form-grid">
-          <input type="date" id="tglInput" />
-          <select id="ukInput">
-            <option value="">-- Pilih Ukuran --</option>
-            <option data-harga="10.5">45–54 cm (Rp 10.5)</option>
-            <option data-harga="11.4">55–64 cm (Rp 11.4)</option>
-            <option data-harga="12.6">65–74 cm (Rp 12.6)</option>
-            <option data-harga="13.6">75–84 cm (Rp 13.6)</option>
-            <option data-harga="17">85–94 cm (Rp 17)</option>
+        <div class="form">
+          <input type="date" id="tanggal" />
+          <select id="ukuran">
+            <option value="">Pilih Ukuran</option>
+            <option data-harga="10.5">45–54 cm</option>
+            <option data-harga="11.4">55–64 cm</option>
+            <option data-harga="12.6">65–74 cm</option>
+            <option data-harga="13.6">75–84 cm</option>
+            <option data-harga="17">85–94 cm</option>
           </select>
-          <input type="number" id="qtyInput" placeholder="Jumlah Qty" />
-          <button class="btn-main" onclick="tambahData()">Tambah Data</button>
+          <input type="number" id="hasil" placeholder="Jumlah" />
+          <button onclick="tambah()">Tambah</button>
         </div>
 
         <div class="table-wrapper">
@@ -226,280 +265,252 @@
               <tr>
                 <th>Ukuran</th>
                 <th>Harga</th>
-                <th>Qty</th>
+                <th>Jumlah</th>
                 <th>Total</th>
                 <th>Aksi</th>
               </tr>
             </thead>
-            <tbody id="mainTabel"></tbody>
-            <tfoot
-              id="rowGrandTotal"
-              style="display: none; background: #e9f7ef"
-            >
+            <tbody id="tabelBody"></tbody>
+            <tfoot id="tfootTotal">
               <tr>
-                <td colspan="3"><strong>TOTAL KESELURUHAN</strong></td>
-                <td
-                  id="valGrandTotal"
-                  style="font-weight: bold; color: #1e3c72"
-                ></td>
+                <td colspan="3">TOTAL KESELURUHAN</td>
+                <td id="totalKeseluruhan">Rp 0</td>
                 <td></td>
               </tr>
             </tfoot>
           </table>
         </div>
 
-        <button class="btn-action btn-total" onclick="hitungSemua()">
-          🧮 HITUNG TOTAL KESELURUHAN
+        <button class="btn btn-total" onclick="hitungTotalKeseluruhan()">
+          🧮 TOTALKAN KESELURUHAN
         </button>
-        <button class="btn-action btn-pdf" onclick="cetakPDF()">
-          📥 DOWNLOAD LAPORAN PDF
+        <button class="btn btn-pdf" onclick="downloadPDF()">
+          📥 DOWNLOAD PDF
+        </button>
+        <button class="btn btn-hapus" onclick="hapusSemua()">
+          🗑️ HAPUS SEMUA DATA
         </button>
 
-        <div class="footer-info">
-          <strong>Riwayat Akses Perangkat:</strong>
-          <div id="logAkses" style="margin-top: 5px; color: #555">
-            Belum ada riwayat.
-          </div>
+        <div class="history-card">
+          <strong>Info Perangkat:</strong> Terkunci secara otomatis pada browser
+          ini.
           <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0" />
-          <p style="color: red; margin-bottom: 5px">
-            * Tombol Reset di bawah hanya untuk pindah HP (Hapus Semua Data):
-          </p>
           <button
-            onclick="resetTotal()"
+            onclick="resetSistem()"
             style="
               background: #333;
               color: white;
               border: none;
-              padding: 5px 10px;
+              padding: 6px 10px;
               border-radius: 5px;
               cursor: pointer;
+              font-size: 10px;
             "
           >
-            Hapus Semua Data & Kunci
+            RESET & PINDAH PERANGKAT
           </button>
         </div>
       </div>
     </div>
 
     <div id="pdfArea">
-      <h2 style="text-align: center">LAPORAN HASIL KERJA BORONGAN</h2>
-      <p id="pdfTimestamp" style="text-align: center; font-size: 12px"></p>
-      <table style="width: 100%; border: 1px solid black">
+      <h2 style="text-align: center">LAPORAN KERJA BORONGAN</h2>
+      <p id="pdfDate" style="text-align: center; font-size: 12px"></p>
+      <table style="width: 100%; border-collapse: collapse">
         <thead>
-          <tr style="background: #eee">
+          <tr>
             <th>Ukuran</th>
             <th>Harga</th>
             <th>Jumlah</th>
-            <th>Subtotal</th>
+            <th>Total</th>
           </tr>
         </thead>
-        <tbody id="pdfTabelBody"></tbody>
+        <tbody id="pdfTabel"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><b>TOTAL KESELURUHAN</b></td>
+            <td id="pdfGrandTotal"><b>Rp 0</b></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
 
     <script>
-      // === KONFIGURASI ===
-      const PASS_SISTEM = "kerja2026";
+      const PASSWORD_RAHASIA = "kerja2026";
+      let data = JSON.parse(localStorage.getItem("borongan_db")) || [];
       const rupiah = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
-      // FUNGSI CEK PERANGKAT
+      // --- SISTEM KEAMANAN ---
       function getFingerprint() {
         return navigator.userAgent + screen.width + "x" + screen.height;
       }
 
-      // === LOGIKA LOGIN & AUTO-LOGIN ===
       window.onload = function () {
-        const idTerkunci = localStorage.getItem("kerja_device_id");
-        const idSekarang = getFingerprint();
-        const statusLogin = localStorage.getItem("kerja_is_logged_in");
+        const lockedID = localStorage.getItem("device_id_locked");
+        const currentID = getFingerprint();
+        const isLoggedIn = localStorage.getItem("is_logged_in");
 
-        // 1. Cek Blokir Perangkat
-        if (idTerkunci && idTerkunci !== idSekarang) {
-          document.getElementById("authBox").innerHTML = `
-            <h2 style="color:#ff4757">🚫 AKSES DITOLAK</h2>
-            <p>Sistem ini sudah terkunci pada perangkat lain.<br>Gunakan perangkat asli atau hubungi admin.</p>
-          `;
+        // Cek Blokir
+        if (lockedID && lockedID !== currentID) {
+          document.getElementById("authBox").innerHTML =
+            "<h2 style='color:red'>🚫 AKSES DITOLAK</h2><p>Perangkat tidak dikenali.</p>";
           return;
         }
 
-        // 2. Cek Auto-Login
-        if (statusLogin === "true") {
-          tampilkanDashboard();
+        // Cek Auto Login
+        if (isLoggedIn === "true") {
+          showDashboard();
         }
 
-        // Set default tanggal hari ini
-        document.getElementById("tglInput").value = new Date()
+        document.getElementById("tanggal").value = new Date()
           .toISOString()
           .slice(0, 10);
       };
 
-      function prosesLogin() {
+      function cekLogin() {
         const input = document.getElementById("passInput").value;
-        if (input === PASS_SISTEM) {
-          // Kunci perangkat secara permanen
-          if (!localStorage.getItem("kerja_device_id")) {
-            localStorage.setItem("kerja_device_id", getFingerprint());
-          }
-
-          // Set status login permanen (localStorage)
-          localStorage.setItem("kerja_is_logged_in", "true");
-
-          // Catat Riwayat
-          let logs = JSON.parse(localStorage.getItem("kerja_logs") || "[]");
-          logs.push(new Date().toLocaleString() + " - Login Berhasil");
-          localStorage.setItem("kerja_logs", JSON.stringify(logs));
-
-          tampilkanDashboard();
+        if (input === PASSWORD_RAHASIA) {
+          localStorage.setItem("device_id_locked", getFingerprint());
+          localStorage.setItem("is_logged_in", "true");
+          showDashboard();
         } else {
           alert("Password Salah!");
         }
       }
 
-      function keluarSistem() {
-        if (
-          confirm(
-            "Apakah Anda ingin keluar? (Anda akan diminta password lagi nanti)",
-          )
-        ) {
-          localStorage.setItem("kerja_is_logged_in", "false");
+      function logout() {
+        if (confirm("Keluar dari sistem?")) {
+          localStorage.setItem("is_logged_in", "false");
           location.reload();
         }
       }
 
-      function tampilkanDashboard() {
+      function showDashboard() {
         document.getElementById("auth-screen").style.display = "none";
         document.getElementById("main-content").style.display = "block";
-        renderTabel();
-        updateLogView();
+        render();
       }
 
-      function updateLogView() {
-        let logs = JSON.parse(localStorage.getItem("kerja_logs") || "[]");
-        document.getElementById("logAkses").innerHTML = logs
-          .reverse()
-          .slice(0, 3)
-          .join("<br>");
+      function resetSistem() {
+        if (confirm("Hapus semua data dan pindah perangkat?")) {
+          localStorage.clear();
+          location.reload();
+        }
       }
 
-      // === LOGIKA DATA DASHBOARD ===
-      let db = JSON.parse(localStorage.getItem("data_borongan") || "[]");
+      // --- LOGIKA DASHBOARD ---
+      function hariTanggal(t) {
+        const opsi = {
+          weekday: "long",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        };
+        return new Date(t).toLocaleDateString("id-ID", opsi);
+      }
 
-      function tambahData() {
-        const tgl = document.getElementById("tglInput").value;
-        const ukSelect = document.getElementById("ukInput");
-        const qty = document.getElementById("qtyInput").value;
+      function tambah() {
+        const uk = document.getElementById("ukuran");
+        const hasil = document.getElementById("hasil");
+        const tgl = document.getElementById("tanggal").value;
 
-        if (!tgl || !ukSelect.value || !qty) return alert("Isi semua kolom!");
+        if (!uk.value || !hasil.value) return alert("Lengkapi data!");
 
-        const harga = parseFloat(
-          ukSelect.options[ukSelect.selectedIndex].dataset.harga,
-        );
-
-        db.push({
+        const harga = Number(uk.options[uk.selectedIndex].dataset.harga);
+        data.push({
           id: Date.now(),
           tanggal: tgl,
-          ukuran: ukSelect.value,
+          ukuran: uk.value,
           harga: harga,
-          qty: parseInt(qty),
-          total: harga * parseInt(qty),
+          hasil: Number(hasil.value),
+          total: harga * Number(hasil.value),
         });
 
-        localStorage.setItem("data_borongan", JSON.stringify(db));
-        ukSelect.value = "";
-        document.getElementById("qtyInput").value = "";
-        document.getElementById("rowGrandTotal").style.display = "none";
-        renderTabel();
+        localStorage.setItem("borongan_db", JSON.stringify(data));
+        uk.value = "";
+        hasil.value = "";
+        document.getElementById("tfootTotal").style.display = "none";
+        render();
       }
 
-      function renderTabel() {
-        const body = document.getElementById("mainTabel");
+      function render() {
+        const body = document.getElementById("tabelBody");
         body.innerHTML = "";
-
-        // Kelompokkan berdasar tanggal
-        const grup = db.reduce((acc, obj) => {
-          acc[obj.tanggal] = acc[obj.tanggal] || [];
-          acc[obj.tanggal].push(obj);
+        const group = data.reduce((acc, curr) => {
+          acc[curr.tanggal] = acc[curr.tanggal] || [];
+          acc[curr.tanggal].push(curr);
           return acc;
         }, {});
 
-        Object.keys(grup)
+        Object.keys(group)
           .sort()
           .reverse()
           .forEach((tgl) => {
             let harian = 0;
-            body.innerHTML += `<tr class="tanggal-row"><td colspan="5">📅 ${new Date(tgl).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "short", year: "numeric" })}</td></tr>`;
-
-            grup[tgl].forEach((item) => {
-              harian += item.total;
+            body.innerHTML += `<tr class="tanggal-row"><td colspan="5">${hariTanggal(tgl)}</td></tr>`;
+            group[tgl].forEach((d) => {
+              harian += d.total;
               body.innerHTML += `
               <tr>
-                <td>${item.ukuran}</td>
-                <td>${item.harga}</td>
-                <td>${item.qty}</td>
-                <td>${rupiah(item.total)}</td>
-                <td><button class="btn-del" onclick="hapusData(${item.id})">🗑️</button></td>
-              </tr>
-            `;
+                <td>${d.ukuran}</td>
+                <td>${rupiah(d.harga)}</td>
+                <td>${d.hasil}</td>
+                <td>${rupiah(d.total)}</td>
+                <td><button class="btn-del" onclick="hapus(${d.id})">Hapus</button></td>
+              </tr>`;
             });
-            body.innerHTML += `<tr class="total-harian"><td colspan="3">TOTAL PER HARI</td><td colspan="2">${rupiah(harian)}</td></tr>`;
+            body.innerHTML += `<tr class="total-harian"><td colspan="3">TOTAL PER HARI</td><td>${rupiah(harian)}</td><td></td></tr>`;
           });
       }
 
-      function hapusData(id) {
-        db = db.filter((x) => x.id !== id);
-        localStorage.setItem("data_borongan", JSON.stringify(db));
-        renderTabel();
+      function hapus(id) {
+        data = data.filter((i) => i.id !== id);
+        localStorage.setItem("borongan_db", JSON.stringify(data));
+        render();
       }
 
-      function hitungSemua() {
-        const grand = db.reduce((a, b) => a + b.total, 0);
-        document.getElementById("valGrandTotal").innerText = rupiah(grand);
-        document.getElementById("rowGrandTotal").style.display =
+      function hapusSemua() {
+        if (data.length && confirm("Hapus semua data?")) {
+          data = [];
+          localStorage.removeItem("borongan_db");
+          render();
+        }
+      }
+
+      function hitungTotalKeseluruhan() {
+        const total = data.reduce((a, b) => a + b.total, 0);
+        document.getElementById("totalKeseluruhan").innerText = rupiah(total);
+        document.getElementById("tfootTotal").style.display =
           "table-footer-group";
       }
 
-      async function cetakPDF() {
-        if (db.length === 0) return alert("Tidak ada data untuk dicetak.");
-
-        const pdfTabel = document.getElementById("pdfTabelBody");
-        pdfTabel.innerHTML = "";
+      async function downloadPDF() {
+        if (!data.length) return alert("Data kosong!");
+        const pdfTbl = document.getElementById("pdfTabel");
+        pdfTbl.innerHTML = "";
         let grand = 0;
 
-        db.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal)).forEach(
-          (item) => {
-            grand += item.total;
-            pdfTabel.innerHTML += `
-            <tr>
-              <td>${item.ukuran} (${item.tanggal})</td>
-              <td>${item.harga}</td>
-              <td>${item.qty}</td>
-              <td>${rupiah(item.total)}</td>
-            </tr>`;
-          },
+        // Sort data berdasarkan tanggal untuk laporan
+        const sorted = [...data].sort(
+          (a, b) => new Date(a.tanggal) - new Date(b.tanggal),
         );
-        pdfTabel.innerHTML += `<tr style="background:#eee; font-weight:bold;"><td colspan="3">TOTAL KESELURUHAN</td><td>${rupiah(grand)}</td></tr>`;
 
-        document.getElementById("pdfTimestamp").innerText =
-          "Laporan Borongan - Dicetak pada: " + new Date().toLocaleString();
+        sorted.forEach((d) => {
+          grand += d.total;
+          pdfTbl.innerHTML += `<tr><td>${d.ukuran} (${d.tanggal})</td><td>${rupiah(d.harga)}</td><td>${d.hasil}</td><td>${rupiah(d.total)}</td></tr>`;
+        });
+
+        document.getElementById("pdfGrandTotal").innerText = rupiah(grand);
+        document.getElementById("pdfDate").innerText =
+          "Dicetak pada: " + new Date().toLocaleString();
 
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const pdf = new jsPDF();
         const canvas = await html2canvas(document.getElementById("pdfArea"), {
           scale: 2,
         });
-        doc.addImage(canvas.toDataURL("image/png"), "PNG", 10, 10, 190, 0);
-        doc.save("Laporan_Borongan.pdf");
-      }
-
-      function resetTotal() {
-        if (
-          confirm(
-            "HAPUS SEMUA DATA DAN BUKA KUNCI PERANGKAT? Tindakan ini tidak bisa dibatalkan.",
-          )
-        ) {
-          localStorage.clear();
-          location.reload();
-        }
+        pdf.addImage(canvas.toDataURL("image/png"), "PNG", 10, 10, 190, 0);
+        pdf.save("Laporan_Borongan_Kerjas.pdf");
       }
     </script>
   </body>
