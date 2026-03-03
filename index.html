@@ -5,14 +5,13 @@
     <title>Dashboard Kerja Borongan Kerjas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <style>
-      /* CSS TIDAK DIUBAH */
+      /* CSS TETAP SAMA AGAR TAMPILAN KONSISTEN */
       * {
         box-sizing: border-box;
       }
       body {
-        font-family: Segoe UI;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background: #f4f6f8;
         padding: 12px;
         margin: 0;
@@ -96,8 +95,8 @@
         font-size: 13px;
       }
       td {
-        padding: 6px;
-        font-size: 12px;
+        padding: 8px;
+        font-size: 13px;
         text-align: center;
         border-bottom: 1px solid #eee;
       }
@@ -166,7 +165,6 @@
       }
     </style>
   </head>
-
   <body>
     <div id="auth-screen">
       <div class="auth-box" id="authBox">
@@ -228,9 +226,9 @@
             <thead>
               <tr>
                 <th>Ukuran</th>
-                <th>Harga</th>
-                <th>Jumlah</th>
-                <th>Total</th>
+                <th>Harga Satuan</th>
+                <th>Jumlah (Pcs)</th>
+                <th>Total (dlm Rp.)</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -251,13 +249,14 @@
       const PASSWORD_RAHASIA = "kerja2026";
       let data = JSON.parse(localStorage.getItem("borongan_db")) || [];
 
+      // Menampilkan harga normal untuk harga satuan
       const rupiahNormal = (n) => "Rp " + Number(n).toLocaleString("id-ID");
-      const rupiahPotong = (n) =>
-        "Rp " + (Number(n) / 1000).toLocaleString("id-ID");
 
-      function getFingerprint() {
-        return navigator.userAgent + screen.width + "x" + screen.height;
-      }
+      // Menampilkan harga yang dipotong 1000 dengan pemisah titik (Permintaan User)
+      const rupiahPotong = (n) => {
+        const hasilBagi = Math.floor(Number(n) / 1000);
+        return "Rp " + hasilBagi.toLocaleString("id-ID");
+      };
 
       window.onload = function () {
         if (localStorage.getItem("is_logged_in") === "true") showDashboard();
@@ -331,47 +330,33 @@
           .forEach((tgl) => {
             let harian = 0;
 
-            /* ===== INI BAGIAN YANG DITAMBAHKAN ===== */
-            body.innerHTML += `
-<tr class="tanggal-row">
-<td colspan="4">${hariTanggal(tgl)}</td>
-<td>
-<button class="btn-pdf-hari" onclick="downloadPDFHari('${tgl}')">
-📄 Cetak PDF
-</button>
-</td>
-</tr>`;
-
-            /* ======================================= */
+            body.innerHTML += `<tr class="tanggal-row"><td colspan="4">${hariTanggal(
+              tgl,
+            )}</td><td><button class="btn-pdf-hari" onclick="downloadPDFHari('${tgl}')">📄 Cetak PDF</button></td></tr>`;
 
             group[tgl].forEach((d) => {
               harian += d.total;
               grandTotal += d.total;
 
-              body.innerHTML += `
-<tr>
-<td>${d.ukuran}</td>
-<td>${rupiahNormal(d.harga)}</td>
-<td>${d.hasil}</td>
-<td>${rupiahPotong(d.total)}</td>
-<td><button class="btn-del" onclick="hapus(${d.id})">Hapus</button></td>
-</tr>`;
+              body.innerHTML += `<tr>
+                <td>${d.ukuran}</td>
+                <td>${rupiahNormal(d.harga)}</td>
+                <td>${d.hasil}</td>
+                <td style="font-weight:bold">${rupiahPotong(d.total)}</td>
+                <td><button class="btn-del" onclick="hapus(${
+                  d.id
+                })">Hapus</button></td>
+              </tr>`;
             });
 
-            body.innerHTML += `
-<tr class="total-harian">
-<td colspan="3">TOTAL PER HARI</td>
-<td>${rupiahPotong(harian)}</td>
-<td></td>
-</tr>`;
+            body.innerHTML += `<tr class="total-harian"><td colspan="3">TOTAL PER HARI</td><td style="color:#1e3c72; font-weight:bold">${rupiahPotong(
+              harian,
+            )}</td><td></td></tr>`;
           });
 
-        body.innerHTML += `
-<tr style="background:#1e3c72;color:white;font-weight:bold">
-<td colspan="3">TOTAL KESELURUHAN</td>
-<td>${rupiahPotong(grandTotal)}</td>
-<td></td>
-</tr>`;
+        body.innerHTML += `<tr style="background:#1e3c72;color:white;font-weight:bold"><td colspan="3">TOTAL KESELURUHAN</td><td>${rupiahPotong(
+          grandTotal,
+        )}</td><td></td></tr>`;
       }
 
       function hapus(id) {
@@ -388,7 +373,7 @@
         }
       }
 
-      /* PDF FUNCTIONS TIDAK DIUBAH */
+      /* PDF FUNCTIONS */
       function headerPDF(pdf, y) {
         pdf.setFillColor(30, 60, 114);
         pdf.setTextColor(255, 255, 255);
