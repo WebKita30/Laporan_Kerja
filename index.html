@@ -115,10 +115,12 @@
         background: #eef3ff;
         font-weight: bold;
         text-align: left;
+        padding-left: 10px;
       }
       .total-harian {
         background: #fafafa;
         font-weight: bold;
+        color: #1e3c72;
       }
       tfoot {
         display: none;
@@ -132,6 +134,17 @@
         padding: 4px 8px;
         border-radius: 6px;
         cursor: pointer;
+      }
+      /* Tombol Print Kecil di Baris Tanggal */
+      .btn-print-sm {
+        background: #3498db;
+        color: #fff;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 10px;
+        margin-left: 15px;
       }
       .btn {
         width: 100%;
@@ -249,18 +262,18 @@
           <input type="date" id="tanggal" />
           <select id="ukuran">
             <option value="">Pilih Ukuran</option>
-            <option data-harga="10.5">45–54 cm</option>
-            <option data-harga="11.4">55–64 cm</option>
-            <option data-harga="12.6">65–74 cm</option>
-            <option data-harga="13.6">75–84 cm</option>
-            <option data-harga="17">85–94 cm</option>
+            <option data-harga="10.5">45–54 cm (10.5)</option>
+            <option data-harga="11.4">55–64 cm (11.4)</option>
+            <option data-harga="12.6">65–74 cm (12.6)</option>
+            <option data-harga="13.68">75–84 cm (13.68)</option>
+            <option data-harga="17">85–94 cm (17)</option>
           </select>
           <input type="number" id="hasil" placeholder="Jumlah" />
           <button onclick="tambah()">Tambah</button>
         </div>
 
         <div class="table-wrapper">
-          <table>
+          <table id="myTable">
             <thead>
               <tr>
                 <th>Ukuran</th>
@@ -273,8 +286,10 @@
             <tbody id="tabelBody"></tbody>
             <tfoot id="tfootTotal">
               <tr>
-                <td colspan="3">TOTAL KESELURUHAN</td>
-                <td id="totalKeseluruhan">Rp 0</td>
+                <td colspan="3" style="text-align: right; padding-right: 20px">
+                  TOTAL KESELURUHAN
+                </td>
+                <td id="totalKeseluruhan" style="font-size: 16px">Rp 0</td>
                 <td></td>
               </tr>
             </tfoot>
@@ -285,15 +300,15 @@
           🧮 TOTALKAN KESELURUHAN
         </button>
         <button class="btn btn-pdf" onclick="downloadPDF()">
-          📥 DOWNLOAD PDF
+          📥 DOWNLOAD PDF (PER HALAMAN)
         </button>
         <button class="btn btn-hapus" onclick="hapusSemua()">
           🗑️ HAPUS SEMUA DATA
         </button>
 
         <div class="history-card">
-          <strong>Info Perangkat:</strong> Terkunci secara otomatis pada browser
-          ini.
+          <strong>Info:</strong> Data disimpan otomatis di browser ini. Gunakan
+          Reset jika ingin menghapus semua cache.
           <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0" />
           <button
             onclick="resetSistem()"
@@ -307,18 +322,19 @@
               font-size: 10px;
             "
           >
-            RESET & PINDAH PERANGKAT
+            RESET SISTEM
           </button>
         </div>
       </div>
     </div>
 
     <div id="pdfArea">
-      <h2 style="text-align: center">LAPORAN KERJA BORONGAN</h2>
+      <h2 id="pdfJudul" style="text-align: center">LAPORAN KERJA BORONGAN</h2>
       <p id="pdfDate" style="text-align: center; font-size: 12px"></p>
       <table style="width: 100%; border-collapse: collapse">
         <thead>
           <tr>
+            <th>Tanggal</th>
             <th>Ukuran</th>
             <th>Harga</th>
             <th>Jumlah</th>
@@ -328,7 +344,7 @@
         <tbody id="pdfTabel"></tbody>
         <tfoot>
           <tr>
-            <td colspan="3"><b>TOTAL KESELURUHAN</b></td>
+            <td colspan="4"><b>TOTAL HALAMAN INI</b></td>
             <td id="pdfGrandTotal"><b>Rp 0</b></td>
           </tr>
         </tfoot>
@@ -337,31 +353,23 @@
 
     <script>
       const PASSWORD_RAHASIA = "kerja2026";
-      let data = JSON.parse(localStorage.getItem("borongan_db")) || [];
-      const rupiah = (n) => "Rp " + Number(n).toLocaleString("id-ID");
 
-      // --- SISTEM KEAMANAN ---
-      function getFingerprint() {
-        return navigator.userAgent + screen.width + "x" + screen.height;
-      }
+      // Ambil data dan LANGSUNG PERBAIKI jika ada nominal jutaan yang salah input
+      let rawData = JSON.parse(localStorage.getItem("borongan_db")) || [];
+      let data = rawData.map((item) => {
+        let t = item.total;
+        if (t > 500000) t = t / 1000; // Koreksi: 13.000.000 jadi 13.000
+        return { ...item, total: Math.round(t) };
+      });
+
+      const rupiah = (n) =>
+        "Rp " + Math.round(n).toLocaleString("id-ID").replace(/,/g, ".");
 
       window.onload = function () {
-        const lockedID = localStorage.getItem("device_id_locked");
-        const currentID = getFingerprint();
         const isLoggedIn = localStorage.getItem("is_logged_in");
-
-        // Cek Blokir
-        if (lockedID && lockedID !== currentID) {
-          document.getElementById("authBox").innerHTML =
-            "<h2 style='color:red'>🚫 AKSES DITOLAK</h2><p>Perangkat tidak dikenali.</p>";
-          return;
-        }
-
-        // Cek Auto Login
         if (isLoggedIn === "true") {
           showDashboard();
         }
-
         document.getElementById("tanggal").value = new Date()
           .toISOString()
           .slice(0, 10);
@@ -370,7 +378,6 @@
       function cekLogin() {
         const input = document.getElementById("passInput").value;
         if (input === PASSWORD_RAHASIA) {
-          localStorage.setItem("device_id_locked", getFingerprint());
           localStorage.setItem("is_logged_in", "true");
           showDashboard();
         } else {
@@ -392,18 +399,18 @@
       }
 
       function resetSistem() {
-        if (confirm("Hapus semua data dan pindah perangkat?")) {
+        if (confirm("Hapus semua data dan reset aplikasi?")) {
           localStorage.clear();
           location.reload();
         }
       }
 
-      // --- LOGIKA DASHBOARD ---
+      // --- FORMAT TANGGAL BARU (ADA NAMA HARI) ---
       function hariTanggal(t) {
         const opsi = {
           weekday: "long",
           year: "numeric",
-          month: "short",
+          month: "long",
           day: "numeric",
         };
         return new Date(t).toLocaleDateString("id-ID", opsi);
@@ -417,17 +424,19 @@
         if (!uk.value || !hasil.value) return alert("Lengkapi data!");
 
         const harga = Number(uk.options[uk.selectedIndex].dataset.harga);
+        const qty = Number(hasil.value);
+        const totalHitung = Math.round(harga * qty);
+
         data.push({
           id: Date.now(),
           tanggal: tgl,
           ukuran: uk.value,
           harga: harga,
-          hasil: Number(hasil.value),
-          total: harga * Number(hasil.value),
+          hasil: qty,
+          total: totalHitung,
         });
 
         localStorage.setItem("borongan_db", JSON.stringify(data));
-        uk.value = "";
         hasil.value = "";
         document.getElementById("tfootTotal").style.display = "none";
         render();
@@ -436,6 +445,7 @@
       function render() {
         const body = document.getElementById("tabelBody");
         body.innerHTML = "";
+
         const group = data.reduce((acc, curr) => {
           acc[curr.tanggal] = acc[curr.tanggal] || [];
           acc[curr.tanggal].push(curr);
@@ -447,15 +457,23 @@
           .reverse()
           .forEach((tgl) => {
             let harian = 0;
-            body.innerHTML += `<tr class="tanggal-row"><td colspan="5">${hariTanggal(tgl)}</td></tr>`;
+            // Baris Header Tanggal + Tombol Print Per Hari
+            body.innerHTML += `
+              <tr class="tanggal-row">
+                <td colspan="5">
+                  📅 ${hariTanggal(tgl)} 
+                  <button class="btn-print-sm" onclick="downloadPDFHarian('${tgl}')">Print Hari Ini</button>
+                </td>
+              </tr>`;
+
             group[tgl].forEach((d) => {
               harian += d.total;
               body.innerHTML += `
               <tr>
                 <td>${d.ukuran}</td>
-                <td>${rupiah(d.harga)}</td>
-                <td>${d.hasil}</td>
-                <td>${rupiah(d.total)}</td>
+                <td>${d.harga}</td>
+                <td>${d.hasil.toLocaleString("id-ID")}</td>
+                <td style="font-weight:bold;">${rupiah(d.total)}</td>
                 <td><button class="btn-del" onclick="hapus(${d.id})">Hapus</button></td>
               </tr>`;
             });
@@ -470,7 +488,7 @@
       }
 
       function hapusSemua() {
-        if (data.length && confirm("Hapus semua data?")) {
+        if (data.length && confirm("Hapus semua data kerja?")) {
           data = [];
           localStorage.removeItem("borongan_db");
           render();
@@ -484,33 +502,62 @@
           "table-footer-group";
       }
 
-      async function downloadPDF() {
-        if (!data.length) return alert("Data kosong!");
-        const pdfTbl = document.getElementById("pdfTabel");
-        pdfTbl.innerHTML = "";
-        let grand = 0;
-
-        // Sort data berdasarkan tanggal untuk laporan
-        const sorted = [...data].sort(
-          (a, b) => new Date(a.tanggal) - new Date(b.tanggal),
-        );
-
-        sorted.forEach((d) => {
-          grand += d.total;
-          pdfTbl.innerHTML += `<tr><td>${d.ukuran} (${d.tanggal})</td><td>${rupiah(d.harga)}</td><td>${d.hasil}</td><td>${rupiah(d.total)}</td></tr>`;
-        });
-
-        document.getElementById("pdfGrandTotal").innerText = rupiah(grand);
-        document.getElementById("pdfDate").innerText =
-          "Dicetak pada: " + new Date().toLocaleString();
-
+      // --- LOGIKA PDF MULTI-HALAMAN ---
+      async function generatePDF(judul, filterData) {
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF();
-        const canvas = await html2canvas(document.getElementById("pdfArea"), {
-          scale: 2,
-        });
-        pdf.addImage(canvas.toDataURL("image/png"), "PNG", 10, 10, 190, 0);
-        pdf.save("Laporan_Borongan_Kerjas.pdf");
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        // Grouping data berdasarkan tanggal
+        const grouped = filterData.reduce((acc, curr) => {
+          acc[curr.tanggal] = acc[curr.tanggal] || [];
+          acc[curr.tanggal].push(curr);
+          return acc;
+        }, {});
+
+        const sortedDates = Object.keys(grouped).sort();
+
+        // Loop setiap tanggal untuk dibuatkan halaman tersendiri
+        for (let i = 0; i < sortedDates.length; i++) {
+          const tgl = sortedDates[i];
+          const items = grouped[tgl];
+
+          const pdfTbl = document.getElementById("pdfTabel");
+          pdfTbl.innerHTML = "";
+          let totalHalaman = 0;
+
+          items.forEach((d) => {
+            totalHalaman += d.total;
+            pdfTbl.innerHTML += `<tr><td>${d.tanggal}</td><td>${d.ukuran}</td><td>${d.harga}</td><td>${d.hasil}</td><td>${rupiah(d.total)}</td></tr>`;
+          });
+
+          document.getElementById("pdfJudul").innerText = judul;
+          document.getElementById("pdfGrandTotal").innerText =
+            rupiah(totalHalaman);
+          document.getElementById("pdfDate").innerText =
+            `Halaman ${i + 1} - Tanggal: ${tgl}`;
+
+          const canvas = await html2canvas(document.getElementById("pdfArea"), {
+            scale: 2,
+          });
+          const imgData = canvas.toDataURL("image/png");
+
+          // Jika bukan halaman pertama, tambah halaman baru
+          if (i > 0) pdf.addPage();
+
+          pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
+        }
+
+        pdf.save(judul.replace(/ /g, "_") + ".pdf");
+      }
+
+      function downloadPDFHarian(tgl) {
+        const dataHarian = data.filter((d) => d.tanggal === tgl);
+        generatePDF("Laporan Borongan Harian", dataHarian);
+      }
+
+      function downloadPDF() {
+        if (!data.length) return alert("Data masih kosong!");
+        generatePDF("Laporan Keseluruhan Borongan", data);
       }
     </script>
   </body>
